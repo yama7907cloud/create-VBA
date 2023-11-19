@@ -1,0 +1,108 @@
+Option Explicit
+Sub surchWord() '''''''比較してラップしない者を抽出
+
+Const firKey = "A"
+Const secKey = "AA"
+
+Const sRow = 1
+
+'---------------------------------シートを新しく作成
+Dim NewWorkSheet As Worksheet, serchWorkSheet As Worksheet, startCeleRow As Long, endCeleRow As Long
+Dim i As Long, keyWord1 As String
+Dim myRange As Range, myObj As Range, myRange1 As Range, myObj1 As Range
+
+    Set serchWorkSheet = ThisWorkbook.Sheets(ActiveSheet.Name)
+    Set NewWorkSheet = Worksheets.Add()
+    NewWorkSheet.Name = Format(Now, "yymmdd---hhmmdd")
+
+  endCeleRow = serchWorkSheet.Cells(Rows.count, firKey).End(xlUp).Row
+
+
+For i = sRow To endCeleRow
+
+    keyWord1 = serchWorkSheet.Cells(i, firKey).Value
+    
+    If keyWord1 <> "" Then
+        With serchWorkSheet
+            Set myRange = .Range(.Columns(secKey), .Columns(secKey))
+            Set myObj = myRange.Find(keyWord1, LookAt:=xlWhole)
+                If myObj Is Nothing Then
+                    
+                Else
+                    With NewWorkSheet
+                        Set myRange1 = .Range(.Columns(1), .Columns(1))
+                        Set myObj1 = myRange1.Find(keyWord1, LookAt:=xlWhole)
+                            If myObj1 Is Nothing Then
+                                If .Cells(NewWorkSheet.Cells(Rows.count, firKey).End(xlUp).Row, 1) = "" Then
+                                    .Cells(NewWorkSheet.Cells(Rows.count, firKey).End(xlUp).Row, 1) = keyWord1
+                                Else
+                                    .Cells(NewWorkSheet.Cells(Rows.count, firKey).End(xlUp).Row + 1, 1) = keyWord1
+                                End If
+                            End If
+                    End With
+                End If
+        End With
+    End If
+    
+Next i
+    
+End Sub
+Sub surchWordCount() '''''''買った人と回数を取得
+
+Const firKey = "A"
+Const secKey = "AA"
+
+Const sRow = 1
+
+'---------------------------------シートを新しく作成
+Dim NewWorkSheet As Worksheet, serchWorkSheet As Worksheet, startCeleRow As Long, endCeleRow As Long
+Dim i As Long, keyWord1 As String
+Dim myRange As Range, myObj As Range, myCell As Range, myRange1 As Range, myObj1 As Range
+Dim count As Long
+
+
+    Set serchWorkSheet = ThisWorkbook.Sheets(ActiveSheet.Name)
+    Set NewWorkSheet = Worksheets.Add()
+    NewWorkSheet.Name = Format(Now, "yymmdd---hhmmdd")
+
+  endCeleRow = serchWorkSheet.Cells(Rows.count, firKey).End(xlUp).Row
+
+
+For i = sRow To endCeleRow
+
+    keyWord1 = serchWorkSheet.Cells(i, firKey).Value
+    
+    If keyWord1 <> "" Then
+        With serchWorkSheet
+            Set myRange = .Range(.Columns(secKey), .Columns(secKey))
+            Set myObj = myRange.Find(keyWord1, LookAt:=xlWhole)
+                If myObj Is Nothing Then
+                    
+                Else
+                    Set myCell = myObj
+                    count = 0
+                        Do
+                            Set myCell = myRange.FindNext(myCell)
+                                count = count + 1
+                        Loop While myCell.Row <> myObj.Row
+                        
+                            With NewWorkSheet
+                                Set myRange1 = .Range(.Columns(1), .Columns(1))
+                                Set myObj1 = myRange1.Find(keyWord1, LookAt:=xlWhole)
+                                    If myObj1 Is Nothing Then
+                                        If .Cells(NewWorkSheet.Cells(Rows.count, firKey).End(xlUp).Row, 1) = "" Then
+                                            .Cells(NewWorkSheet.Cells(Rows.count, firKey).End(xlUp).Row, 1) = keyWord1
+                                            .Cells(NewWorkSheet.Cells(Rows.count, firKey).End(xlUp).Row, 2) = count
+                                        Else
+                                            .Cells(NewWorkSheet.Cells(Rows.count, firKey).End(xlUp).Row + 1, 1) = keyWord1
+                                            .Cells(NewWorkSheet.Cells(Rows.count, firKey).End(xlUp).Row, 2) = count
+                                        End If
+                                    End If
+                            End With
+                End If
+        End With
+    End If
+    
+Next i
+    
+End Sub
